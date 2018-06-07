@@ -31,8 +31,66 @@ function setWindow() {
 
 function startGame() {
     resetInitial();
+    clearWindows();
     generateFaces();
     cloneFaces();
+    counter(initialTime);
+}
+
+function counter(time) {
+    startBtn.style.opacity = 0.5;
+    startBtn.onclick = null;
+    var loop = setInterval(counting, 1000);
+    function counting() {
+        time--;
+        timeBox.innerHTML = time;
+        if (time < 0) {
+            clearInterval(loop);
+            var restart = confirm("Game Over!\n\n" + "Your score is: " + points + "\nOn level: " + initialLevel + "\n\nDo you want play again?");
+            if (restart) {
+                startGame();
+            } else {
+                body.onclick = null;
+                resetInitial();
+                clearWindows();
+                startBtn.style.opacity = 1;
+                startBtn.onclick = function () {
+                    startGame();
+                };
+            }
+        } else {
+            leftSide.lastChild.onclick = function (event) {
+                event.stopPropagation();
+                clearInterval(loop);
+                numberOfFaces += 5;
+                initialLevel++;
+                points = points + (2 * initialLevel);
+                time = initialTime * (initialLevel / 2);
+                resetValue(time, initialLevel, points);
+                count = 0;
+                clearWindows();
+                generateFaces();
+                cloneFaces();
+                counter(time);
+            }
+            body.onclick = function () {
+                clearInterval(loop);
+                var restart = confirm("Game Over!\n\n" + "Your score is: " + points + "\nOn level: " + initialLevel + "\n\nDo you want play again?");
+                if (restart) {
+                    startGame();
+                } else {
+                    body.onclick = null;
+                    leftSide.lastChild.onclick = null;
+                    resetInitial();
+                    clearWindows();
+                    startBtn.style.opacity = 1;
+                    startBtn.onclick = function () {
+                        startGame();
+                    };
+                }
+            }
+        }
+    }
 }
 
 function resetInitial() {
@@ -70,5 +128,14 @@ function cloneFaces() {
     leftSideImages.removeChild(leftSideImages.lastChild);
     leftSideImages.removeAttribute('id');
     rightSide.appendChild(leftSideImages);
+}
+
+function clearWindows() {
+    while (leftSide.firstChild) {
+        leftSide.removeChild(leftSide.firstChild);
+    }
+    while (rightSide.firstChild) {
+        rightSide.removeChild(rightSide.firstChild);
+    }
 }
 
